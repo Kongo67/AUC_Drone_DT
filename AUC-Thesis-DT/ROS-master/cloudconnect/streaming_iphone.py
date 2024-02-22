@@ -13,8 +13,6 @@ import pprint
 import tempfile
 
 
-
-
     
 sys.path.append('/usr/local/lib/python2.7/site-packages')
 def image_callback():
@@ -25,11 +23,12 @@ def image_callback():
     #   print(type(im))
     #   print(im)
     #   frame = cv2.resize(im,(300,150), interpolation = cv2.INTER_AREA)
-
+      print("14")
       while True:
             # Read a frame from the webcam
+            #print("89")
             responses = client.simGetImages([
-            # airsim.ImageRequest("0", airsim.ImageType.DepthVis),  #depth visualization image
+               # airsim.ImageRequest("0", airsim.ImageType.DepthVis),  #depth visualization image
             airsim.ImageRequest("1", airsim.ImageType.DepthPerspective, True), #depth in perspective projection
             airsim.ImageRequest("1", airsim.ImageType.Scene), #scene vision image in png format
             airsim.ImageRequest("1", airsim.ImageType.Scene, False, False)])  #scene vision image in uncompressed RGBA array
@@ -53,11 +52,12 @@ def image_callback():
                     img_rgb = cv2.resize(img_rgb,(300,150), interpolation = cv2.INTER_AREA)
                     streamer.send_data(img_rgb)
 
-    except:
-      print("error")      
+    except Exception as e:
+      print("error {}".format(e))      
 
 class CVClient(object):
     def __init__(self, server_addr, stream_fps):
+        print("0")
         self.server_addr = server_addr
         self.server_port = 8000
         self._stream_fps = stream_fps
@@ -72,12 +72,14 @@ class CVClient(object):
         # Encode frame in base64 representation and remove
         # utf-8 encoding
         # frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        
+        print("1")
         frame = base64.b64encode(frame).decode('utf-8')
+        print("2")
         return "data:image/jpeg;base64,{}".format(frame)
 
     def send_data(self, frame):
         cur_t = time.time()
+        print("3")
         if cur_t - self._last_update_t > self._wait_t:
             self._last_update_t = cur_t
             sio.emit(

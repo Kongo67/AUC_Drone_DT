@@ -6,7 +6,7 @@ from pickle import NONE
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
-from sensor_msgs.msg import Imu
+from sensor_msgs.msg import Imu,NavSatFix
 from nav_msgs.msg import Odometry
 import json
 import time
@@ -52,10 +52,13 @@ def cmd_vel_callback(msg):
 def pose_callback(msg):
     position_dict = {}
     position_dict['sensor_name'] = 'Position_Digital_1'
-    position_dict['position_x'] = msg.pose.pose.position.x
-    position_dict['position_y'] = msg.pose.pose.position.y
-    position_dict['position_z'] = msg.pose.pose.position.z
-    print (position_dict['position_x'])
+    # position_dict['position_x'] = msg.pose.pose.position.x
+    # position_dict['position_y'] = msg.pose.pose.position.y
+    # position_dict['position_z'] = msg.pose.pose.position.z
+    position_dict['magnitude'] = msg.latitude
+    position_dict['position_y'] = msg.longitude
+    position_dict['position_z'] = msg.altitude
+    print (position_dict['magnitude'])
     # encoded_data_string = json.dumps(position_dict)
     # print('json',encoded_data_string)
     send_dictionary(position_dict,'metric')
@@ -100,6 +103,8 @@ def acc_callback(msg):
 
 rospy.init_node('sensor_fusion')
 vel_sub = rospy.Subscriber('/cmd_vel',Twist , cmd_vel_callback)
-acc_sub = rospy.Subscriber('/imu',Imu , acc_callback)
+acc_sub = rospy.Subscriber('/mavros/imu/data',Imu , acc_callback)
+gps_sub = rospy.Subscriber('/mavros/global_position/global',NavSatFix , pose_callback)
+
 #acc_sub = rospy.Subscriber('/odom',Odometry , pose_callback)
 rospy.spin()

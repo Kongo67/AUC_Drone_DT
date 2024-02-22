@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="Sensor_data" type="Sensor_data.py" name="Sensor_data" output="screen">
+        
+    </node>
+</launch>

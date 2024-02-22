@@ -9,15 +9,22 @@ import math
 import message_converter
 import subprocess
 # from django.db import connections
-import mysql.connector
+#import mysql.connector
 import time
 import os 
 import subprocess
 #Kinesis SDK
 import boto3
 import csv
+import airsim
 
-kinesis_client = boto3.client('kinesis')
+
+#kinesis_client = boto3.client('kinesis')
+############################################### GHYRNAAAAAA AL CLIENT HENAAA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!################################################
+kinesis_client = airsim.VehicleClient()
+############################################### GHYRNAAAAAA AL CLIENT HENAAA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!################################################3
+
+
 
 
 # data = {"sensor_name": "Accelerometer1",
@@ -151,21 +158,22 @@ def preprocessing(data):
       flag = True
       
 
-    # if(bool(re.search("^Position", data["sensor_name"]))):
-    #   print("position")
-    #   data = {"sensor_name" : data["sensor_name"],
-    #           "lat": data['position_x'],
-    #           "lng": data['position_y'],
-    #           "time": json.dumps(round(time.time()*1000), default=str)
-    #         }
-    #   subprocess.run(['aws', 'cloudwatch', 'put-metric-data', '--metric-name', 'Position_x', '--namespace', 'Turtlebot3', '--value', f'''{data['lat']}'''])
-    #   subprocess.run(['aws', 'cloudwatch', 'put-metric-data', '--metric-name', 'Position_y', '--namespace', 'Turtlebot3', '--value', f'''{data['lng']}'''])
+    if(bool(re.search("^Position", data["sensor_name"]))):
+      print("position")
+      data = {"sensor_name" : data["sensor_name"],
+              "magnitude": data['magnitude'],
+              #"lng": data['long'],
+              #"alt": data['alt'],
+              "time": json.dumps(round(time.time()*1000), default=str)
+            }
+      # subprocess.run(['aws', 'cloudwatch', 'put-metric-data', '--metric-name', 'Position_x', '--namespace', 'Turtlebot3', '--value', f'''{data['lat']}'''])
+      # subprocess.run(['aws', 'cloudwatch', 'put-metric-data', '--metric-name', 'Position_y', '--namespace', 'Turtlebot3', '--value', f'''{data['lng']}'''])
 
-      #response = kinesis_client.put_record(StreamName='turtlebot', Data=f'''{{"Position_x":"{data['lat']}"}}''',PartitionKey='123',)
-      #print(response)
-      #response = kinesis_client.put_record(StreamName='turtlebot', Data=f'''{{"Position_y":"{data['lng']}"}}''',PartitionKey='123',)
-      #print(response)
-
+      # response = kinesis_client.put_record(StreamName='turtlebot', Data=f'''{{"Position_x":"{data['lat']}"}}''',PartitionKey='123',)
+      # print(response)
+      # response = kinesis_client.put_record(StreamName='turtlebot', Data=f'''{{"Position_y":"{data['lng']}"}}''',PartitionKey='123',)
+      # print(response)
+      flag = True
 
     else:  
       if(i==30):      
@@ -191,7 +199,7 @@ def listener():
     # run simultaneously.
     rospy.init_node('listener', anonymous=True)
 
-    rospy.Subscriber("metric", String, callback)
+    rospy.Subscriber("/metric", String, callback) #metric badal /mavros/imu/data_raw
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
